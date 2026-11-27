@@ -14,12 +14,12 @@ In its first six months the fleet grew to more than 20 turnstiles in seven citie
 
 | | |
 |---|---|
-| **Role** | Sole software engineer: architecture, device software, integration with the partner platform and the turnstile controllers, device preparation, releases, monitoring and support |
+| **Role** | Sole software engineer: architecture, device software, integration with the partner platform and the turnstile controllers, device preparation, release management, fleet observability and incident response |
 | **In the field** | In production since June 2026: more than 20 turnstiles at gyms, dance and pilates studios and a swimming facility in seven cities across Türkiye |
 | **Runs on** | One Raspberry Pi 3 per turnstile with a 7-inch touch screen or an HDMI screen, and a cloud collector with Prometheus, Alertmanager and Grafana |
 | **Integrates with** | The partner platform's WebSocket API; turnstile controllers through GPIO in the field (direct, a relay board or a single shared input), with RS-485 serial as another implementation; USB card readers |
 | **Delivery** | 20 stable releases from May to October 2026, every update to a field device delivered remotely; since late June each arrives as an exact-tag bundle with a known-good rollback |
-| **Stack** | Python (asyncio, WebSockets), Linux, systemd, Raspberry Pi GPIO and serial, Chromium kiosk, FastAPI, Prometheus, Grafana, Tailscale, pytest, GitHub Actions |
+| **Stack** | Python (asyncio, WebSockets), Linux, systemd, Raspberry Pi GPIO and serial, a React and TypeScript kiosk in Chromium, FastAPI, Prometheus, Grafana, Tailscale, pytest, Playwright, GitHub Actions CI |
 
 ## Field results
 
