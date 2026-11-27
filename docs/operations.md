@@ -9,7 +9,7 @@ I prepare and support the device software, deploy releases and monitor the fleet
   <img alt="Bench preparation and credential check lead to registration and a software handoff. The technician then verifies passage on site. Tagged releases have checks before activation and service verification after restart. A failed verification leads to a recovery attempt." src="../assets/operations-light.svg">
 </picture>
 
-## Commissioning a new turnstile
+## Provisioning a new turnstile
 
 In October 2026 I combined existing provisioning and verification steps into one resumable bench command. A full run checks the partner credential before registration and reports software readiness or the failed checks. A card can also stop at prepared or deferred and resume when the site settings are available. A pending registry entry does not arm device paging.
 
@@ -36,13 +36,13 @@ Each device sends a heartbeat every minute and pushes audit events. The collecto
 | QR missing | An armed, recently reporting device flags a missing QR for 10 minutes (maintenance mode excluded) |
 | Service down | An armed, recently reporting device reports its service inactive for 5 minutes. A probe timeout counts as unknown. |
 | Shared interruption (info) | Four or more devices enter offline free-pass within 10 minutes |
-| Identity conflict (info) | Two devices alternate under one device identity |
+| Identity conflict (info) | Boot IDs alternate under one device identity |
 | Unregistered device (info) | A device outside the registry reports |
 | Collector health | Prometheus cannot scrape the collector, the registry does not parse, or collector disk space runs low |
 
 I arm device paging after activation and burn-in, using observed or known venue hours. Pending devices do not start those pages. Closing time alone does not clear a firing device alarm. The QR and service rules still require fresh heartbeats while firing, so a loss of telemetry can end either signal. Fleet and collector alerts have separate rules.
 
-## What months in the field built into the system
+## Incidents turned into durable fixes
 
 | Field observation | Response |
 |---|---|
@@ -52,7 +52,7 @@ I arm device paging after activation and burn-in, using observed or known venue 
 | The collector already had device heartbeats and audit events | On 8 October a controlled reporting interruption triggered a Telegram alert within 18 minutes. |
 | On 23 October, ten devices at six venues lost their connections within 80 seconds | I prepared a dated report with the timestamps for the partner to investigate. The fleet correlation rule shipped on 24 October and filters stale offline events. |
 | A connection can stop carrying traffic while the socket still appears open | A keepalive timeout triggers reconnection. The logs classify common connection failures and preserve an unknown category for investigation. |
-| The platform can reject a credential after the handshake | If the platform rejects the credential or expected device identity before the first successful exchange in this run, the agent requests technician setup. After prior success, a later rejection follows the offline policy. |
+| The platform can reject a credential after the handshake | If the platform rejects the credential before its first message in this run, the agent requests technician setup; later rejections follow the offline policy. A mismatched device identity always requests setup. |
 | The platform dispatches to the latest connection for a credential | The health report flags a superseded connection. I stage replacement cards separately from the serving gate’s live credential. |
 | A response can be lost after the collector stores a batch | The collector remembers the last 2,048 record digests per device, so a retried batch can be acknowledged without counting its recent records twice. |
 | Fitting kiosk animation to the Pi’s thermal budget | On one Pi 3 B+, Chromium used 0.9–1.7 CPU cores with smooth animation timing and 0.15–0.35 with stepped timing. Only the smooth run crossed the soft-temperature limit during the ten-minute comparison. |
@@ -65,7 +65,7 @@ The fleet can be analysed and supported without storing names, QR text or card c
 
 ## Field results method
 
-An earlier production report counted more than 64,000 access approvals at seven turnstiles from 12 June to 16 October 2026. The audit from 28 October to 27 November 2026 counted 29,158 access approvals. The recent analysis used a filtered event export with neutral device IDs; the earlier figures come from the October production report. "More than 90,000 in the first six months" adds the two disjoint windows and leaves out the eleven days between them, so it is a lower bound. Members in November are counted from the short one-way name hashes the logs keep: 2,329 distinct values from 1 to 27 November, read on the collector without reading names; neither report identifies individual people.
+An earlier production report counted more than 64,000 access approvals at seven turnstiles from 12 June to 16 October 2026. The audit from 28 October to 27 November 2026 counted 29,158 access approvals and more than 2,300 members, counted on the collector from distinct one-way name hashes, so members who share a display name count once and the figure errs low. The recent analysis used a filtered event export with neutral device IDs; the earlier figures come from the October production report. "More than 90,000 in the first six months" adds the two disjoint windows and leaves out the eleven days between them, so it is a lower bound.
 
 The fleet spans more than 20 turnstiles in seven cities; this count and the city count are the company's own records.
 
@@ -74,6 +74,6 @@ By 27 November 2026, 20 non-test devices were registered as active or pending. I
 - **Access approvals.** We count a platform approval once per device, connection, message sequence and payload digest. Approvals include both directions.
 - **Output decisions.** We matched each approval to the first output decision on that device and connection before the next grant. All 29,158 approvals had an output decision. There were 28,834 new pulses, 205 extensions and 119 opposing requests ignored.
 - **Pulse timing and completion.** For the 28,834 new pulses, the median time from the device logging the approval to software pulse start was 3 ms (p99 20 ms). The median to the GPIO output-start log was 12 ms. Matching on device, connection, message sequence and pulse ID yielded 28,831 matching completions. The audit recorded zero pulse-failure events. Three starts had no matching completion.
-- **Socket reopening.** After 1,400 of 1,419 socket closes, a new connection opened on the same device before another close or logged restart. Median time to reopen was 4.1 seconds. Each of the other 19 closes was followed by the agent stopping (14) or starting (5) before a reconnection could happen, so no connection stayed down while the agent was running. On 18 November, 3.52 seconds elapsed from the first close to the last reopening across 12 devices.
+- **Socket reopening.** After 1,400 of 1,419 socket closes, a new connection opened on the same device before another close or logged restart. Median time to reopen was 4.1 seconds. Each of the other 19 closes was followed by the agent stopping (14) or starting (5) before a reconnection could happen. On 18 November, 3.52 seconds elapsed from the first close to the last reopening across 12 devices.
 - **Offline free-pass.** The devices logged 513 activations after the grace period. For 490 of them, a stable reconnection followed on the same device before another activation or logged lifecycle boundary (agent start or stop). The median time from activation to stable reconnection for those pairs was 33 seconds.
 - **Overnight returns.** Many venues switch power off at night. We counted reporting gaps of at least four hours between adjacent local dates, with the previous day’s last heartbeat bin at or after 17:00 and the returning bin before noon. After 124 of 125 such gaps, the device returned and handled an access approval later that day.

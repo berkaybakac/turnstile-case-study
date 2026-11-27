@@ -13,13 +13,13 @@ Accounts, packages, membership rules and the member app belong to the partner pl
 
 ## Protocol
 
-**Raw messages stop at one adapter.**
+**Platform messages stop at the client boundary.**
 The adapter handles optional fields and resolves entry or exit from a grant before the runtime can request a pulse. An unresolved direction cannot trigger a pulse. Where an expected device identity is configured, state-changing events wait until it matches.
 - *Cost:* each new field or action is a deliberate change in the adapter and the protocol notes, with tests.
 - *Rejected:* passing payload dictionaries through the system. The platform's messages changed over time (aliases, optional fields, unexpected values); a tolerant reader at the edge keeps that variability away from hardware.
 
 **Application-level credential checks.**
-The platform can accept a WebSocket handshake before rejecting a credential. If the platform rejects the credential or expected device identity before the first successful application exchange in this run, the agent requests technician setup. After prior success, a later rejection follows the offline policy.
+The platform can accept a WebSocket handshake before rejecting a credential. If the platform rejects the credential before its first message in this run, the agent requests technician setup; later rejections follow the offline policy. A mismatched device identity always requests setup.
 
 **The device detects dead connections itself.**
 A keepalive ping with a short pong timeout closes a socket that still looks open but no longer carries traffic. The logs classify common connection failures and preserve an unknown category for investigation.
@@ -75,7 +75,7 @@ The gallery shows seven venue designs rendered with a demo QR and placeholder br
 - *Cost:* each design must be checked on its own screen size and orientation; a screenshot from the real device is the acceptance test, because it catches what browser emulation can miss.
 
 **Staff free mode with the customer's own PIN.**
-On touch screens, staff can open the turnstile for a set time. The first tap asks the venue to choose its own PIN; it is stored only as a salted hash on the device, checked on every request and locked after repeated failures. A reset by the operator clears it and reopens first setup. Staff free mode is tracked separately from platform and offline free mode, so ending one never overrides the other.
+On touch screens, staff can open the turnstile for a set time. The first tap asks the venue to choose its own PIN; it is stored only as a salted hash on the device, checked on every staff action and locked after repeated failures. A reset by the operator clears it and reopens first setup. Staff free mode is tracked separately from platform and offline free mode, so ending one never overrides the other.
 
 ## Fleet operations
 
